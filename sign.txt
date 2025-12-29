@@ -1,0 +1,23 @@
+src/
+├── api/               # 백엔드(Spring Boot) 통신 코드 (axios 등)
+├── assets/            # 이미지, 폰트
+├── components/        # [UI] 상태가 없고 props만 받아 그리는 컴포넌트
+│   ├── common/        # 재사용 가능한 버튼, 입력창 (Button.tsx, Input.tsx)
+│   └── todo/          # 투두 관련 특화 UI (TodoCard.tsx, TodoItem.tsx)
+├── containers/        # [Logic] 상태(State)를 관리하고 API를 호출하는 부모
+│   └── TodoBoardContainer.tsx
+├── pages/             # 라우팅 페이지 단위
+│   └── TodoPage.tsx
+├── types/             # TypeScript 인터페이스 정의 (.ts)
+│   └── todo.ts
+├── App.tsx
+└── main.tsx
+
+
+
+# 타입 분리
+> types/todo.ts - 타입 정의 분리 (재사용성 + 가독성)
+# UI컴포넌트
+> components/todo/TodoCard.tsx - 오직 부모가 준 데이터(props), 부모가 준 함수를 실행만 한다. TailWind스타일링은 여기서 모두 처리한다.
+# 로직 컴포넌트
+> containers/TodoBardContainer.tsx - 데이터 조작(CRUD) + API CALL 집중
