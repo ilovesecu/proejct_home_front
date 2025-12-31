@@ -10,7 +10,7 @@ import TodoItem from "./TodoItem.tsx";
 interface Props {
     keyword: TodoKeywordResponse;
     onDeleteGroup: (keywordId: number) => void;
-    onAddTask: (keywordId: number, content: string) => void;
+    onAddTask: (keyword: string, content: string) => void;
     onDeleteTask: (keywordId: number, taskId: number) => void;
     onToggleTask: (keywordId: number, taskId: number) => void;
 }
@@ -28,7 +28,7 @@ export default function TodoCard({
     const handleAddSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!taskInput.trim()) return;
-        onAddTask(keyword.keywordId, taskInput);
+        onAddTask(keyword.keyword, taskInput);
         setTaskInput('');
     }
 
@@ -64,7 +64,7 @@ export default function TodoCard({
                             <TodoItem
                                 key={todo.taskId}
                                 todo={todo}
-                                groupId={keyword.keywordId}
+                                keywordId={keyword.keywordId}
                                 onToggle={onToggleTask}
                                 onDelete={onDeleteTask}
                             />

@@ -7,7 +7,8 @@ import type {TodoKeywordResponse} from "../../types/todo.ts";
 import {useEffect, useState} from "react";
 import TodoHeader from "../../components/todo/TodoHeader.tsx";
 import TodoCard from "../../components/todo/TodoCard.tsx";
-import {getTodoAll} from "../../api/todoApi.ts";
+import {createTask, deleteTask, getTodoAll} from "../../api/todoApi.ts";
+import {useImmer} from "use-immer";
 
 export default function TodoContainer(){
     // --- state 관리 ---
@@ -69,10 +70,12 @@ export default function TodoContainer(){
             tasks: [], // 할 일이 없는 경우 (빈 배열)
         },
     ];
+    const [todoData,setTodoData] = useImmer<TodoKeywordResponse[]>([]);
     const [newKeyword, setNewKeyword] = useState('');
     const getInitData = async () => {
-        const  todoKeywordResponse = await getTodoAll();
+        const todoKeywordResponse = await getTodoAll();
         console.log(todoKeywordResponse);
+        setTodoData(todoKeywordResponse);
     }
 
     useEffect(() => {
@@ -90,12 +93,30 @@ export default function TodoContainer(){
 
     }
     // 할 일 추가 함수
-    const handleAddTask = () => {
-
+    const handleAddTask = async (keyword:string, content:string) => {
+        const response = await createTask(keyword, content);
+        console.log(response);
+        if(response.status === "SUCCESS" && response.data.result === 1){
+            const todoAddTaskParam = response.data.todoAddTaskParams;
+            await getInitData();
+        }
     }
-    // 할 일 완료 함수
+    // 할 일 토글 함수
     const handleToggleTask = () => {
 
+    }
+    //할 일 제거 함수
+    const handleDeleteTask = async (keywordId:number, taskId:number) => {
+        const response = await deleteTask(taskId);
+        if(response.data > 0){
+            //todoData에서 keywordId, taskId인 것을 골라서 삭제해줘야함.
+            setTodoData(draft => {
+                const targetKeyword = draft.find(k => k.keywordId === keywordId);
+                if(targetKeyword){
+                    targetKeyword.tasks = targetKeyword.tasks.filter(t => t.taskId !== taskId);
+                }
+            })
+        }
     }
 
     // --- RENDER (화면 조합)
@@ -107,20 +128,20 @@ export default function TodoContainer(){
                 {/* 메인 리스트 영역 */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
                     {
-                        DUMMY_TODO_DATA.map((keyword)=>(
+                        todoData.map((keyword)=>(
                             <TodoCard
                                 key={keyword.keywordId}
                                 keyword={keyword}
                                 onDeleteGroup={handleDeleteKeyword}
-                                onAddTask={handleAddKeyword}
-                                onDeleteTask={handleAddTask}
+                                onAddTask={handleAddTask}
+                                onDeleteTask={handleDeleteTask}
                                 onToggleTask={handleToggleTask}
                             />
                         ))
                     }
                 </div>
                 {
-                    DUMMY_TODO_DATA.length === 0 && (
+                    todoData.length === 0 && (
                         <div className='text-center text-gray-400 py-20'>
                             등록된 키워드가 없습니다. 새로운 키워드를 추가해보세요!
                         </div>
