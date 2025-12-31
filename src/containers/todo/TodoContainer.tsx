@@ -4,9 +4,10 @@
 */
 
 import type {TodoKeywordResponse} from "../../types/todo.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import TodoHeader from "../../components/todo/TodoHeader.tsx";
 import TodoCard from "../../components/todo/TodoCard.tsx";
+import {getTodoAll} from "../../api/todoApi.ts";
 
 export default function TodoContainer(){
     // --- state 관리 ---
@@ -69,7 +70,15 @@ export default function TodoContainer(){
         },
     ];
     const [newKeyword, setNewKeyword] = useState('');
-    
+    const getInitData = async () => {
+        const  todoKeywordResponse = await getTodoAll();
+        console.log(todoKeywordResponse);
+    }
+
+    useEffect(() => {
+        getInitData();
+    }, []);
+
     // --- 비즈니스 로직 ---
     // 키워드 추가 함수
     const handleAddKeyword = () => {
