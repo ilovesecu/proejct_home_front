@@ -38,3 +38,14 @@ export interface TodoAddResponse{
         createdAt : string; //이건 안들어있음.
     }>
 }
+
+export interface TodoKeywordAddResponse{
+    result:number;
+    TodoAddKeywordResult: {
+        id: number;
+        mmUserId:string;
+        name:string;
+        isDeleted:number;
+        createdAt:string;
+    }
+}

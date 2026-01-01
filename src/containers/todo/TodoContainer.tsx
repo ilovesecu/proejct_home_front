@@ -7,7 +7,7 @@ import type {TodoKeywordResponse} from "../../types/todo.ts";
 import {useEffect, useState} from "react";
 import TodoHeader from "../../components/todo/TodoHeader.tsx";
 import TodoCard from "../../components/todo/TodoCard.tsx";
-import {createTask, deleteTask, getTodoAll} from "../../api/todoApi.ts";
+import {createTask, createTodoKeyword, deleteKeyword, deleteTask, getTodoAll, toggleTask} from "../../api/todoApi.ts";
 import {useImmer} from "use-immer";
 
 export default function TodoContainer(){
@@ -84,13 +84,23 @@ export default function TodoContainer(){
 
     // --- 비즈니스 로직 ---
     // 키워드 추가 함수
-    const handleAddKeyword = () => {
+    const handleAddKeyword = async () => {
         if(!newKeyword.trim()) return;
+        const response = await createTodoKeyword(newKeyword.trim());
+        if(response.status === 'SUCCESS'){
+            await getInitData();
+        }
         setNewKeyword('');
     }
     // 키워드 삭제 함수
-    const handleDeleteKeyword = () => {
-
+    const handleDeleteKeyword = async (keywordId:number) => {
+        const response = await deleteKeyword(keywordId);
+        if(response.status === 'SUCCESS'){
+            setTodoData(draft => {
+                //immer가 처리함.
+                return draft.filter(k => k.keywordId !== keywordId);
+            });
+        }
     }
     // 할 일 추가 함수
     const handleAddTask = async (keyword:string, content:string) => {
@@ -102,8 +112,19 @@ export default function TodoContainer(){
         }
     }
     // 할 일 토글 함수
-    const handleToggleTask = () => {
-
+    const handleToggleTask = async (keywordId:number, taskId:number) => {
+        const response = await toggleTask(taskId);
+        if(response.status === 'SUCCESS' && response.data > 0){
+            setTodoData(draft => {
+                const targetKeyword = draft.find(k => k.keywordId === keywordId);
+                if(targetKeyword){
+                    const targetTask = targetKeyword.tasks.find(t => t.taskId === taskId);
+                    if(targetTask){
+                        targetTask.status = targetTask.status === 1 ? 0 : 1;
+                    }
+                }
+            })
+        }
     }
     //할 일 제거 함수
     const handleDeleteTask = async (keywordId:number, taskId:number) => {
