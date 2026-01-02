@@ -9,7 +9,8 @@ RUN npm run build
 FROM nginx:alpine
 # 빌드 결과물을 Nginx의 기본 폴더로 복사
 COPY --from=builder /app/dist /usr/share/nginx/html
-
+# SPA 라우팅 처리를 위한 설정 파일 복사 (아래 2번 참조)
+#COPY nginx.conf /etc/nginx/conf.d/default.conf
 # Nginx 기본 설정은 80포트로 파일을 서빙하므로 설정 파일 복사도 필요 없음 (기본값 사용)
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
