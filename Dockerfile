@@ -1,7 +1,10 @@
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 WORKDIR /app
+#캐싱 최적화 : package.json이 안바뀌면 npm install 패스
 COPY package*.json ./
 RUN npm install
+
+#소스 복사 및 빌드
 COPY . .
 RUN npm run build
 
