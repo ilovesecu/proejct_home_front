@@ -56,7 +56,7 @@ export default function TodoCard({
 
             {/* 할 일 리스트 */}
             <div className="p-5">
-                <ul className="space-y-3 mb-6 min-h-[100px]">
+                <ul className="space-y-3 mb-6 min-h-[100px] max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
                     {keyword.tasks.length === 0 ? (
                         <li className="text-gray-400 text-sm text-center py-4">할 일이 없습니다.</li>
                     ) : (

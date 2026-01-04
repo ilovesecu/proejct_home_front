@@ -106,7 +106,7 @@ export default function TodoContainer(){
     const handleAddTask = async (keyword:string, content:string) => {
         const response = await createTask(keyword, content);
         console.log(response);
-        if(response.status === "SUCCESS" && response.data.result === 1){
+        if(response.status === "SUCCESS" && (response.data.result === 1 || response.data.result === 2)){
             const todoAddTaskParam = response.data.todoAddTaskParams;
             await getInitData();
         }
