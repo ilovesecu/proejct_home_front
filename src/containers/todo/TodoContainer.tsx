@@ -12,64 +12,7 @@ import {useImmer} from "use-immer";
 
 export default function TodoContainer(){
     // --- state 관리 ---
-    const DUMMY_TODO_DATA: TodoKeywordResponse[] = [
-        {
-            keywordId: 1,
-            mmUserId: "user_abc123",
-            keyword: "장보기",
-            isDeleted: 0,
-            keywordCreated: "2024-05-20 10:00:00",
-            tasks: [
-                {
-                    taskId: 101,
-                    content: "우유 900ml 구매",
-                    status: 1, // 1: 완료됨 가정
-                    taskCreated: "2024-05-20 10:05:00",
-                },
-                {
-                    taskId: 102,
-                    content: "계란 한 판",
-                    status: 0, // 0: 미완료 가정
-                    taskCreated: "2024-05-20 10:06:00",
-                },
-                {
-                    taskId: 103,
-                    content: "삼겹살 600g",
-                    status: 0,
-                    taskCreated: "2024-05-20 12:30:00",
-                },
-            ],
-        },
-        {
-            keywordId: 2,
-            mmUserId: "user_abc123",
-            keyword: "개인 프로젝트",
-            isDeleted: 0,
-            keywordCreated: "2024-05-21 09:00:00",
-            tasks: [
-                {
-                    taskId: 201,
-                    content: "DB 스키마 설계",
-                    status: 1,
-                    taskCreated: "2024-05-21 09:10:00",
-                },
-                {
-                    taskId: 202,
-                    content: "API 명세서 작성",
-                    status: 0,
-                    taskCreated: "2024-05-21 14:00:00",
-                },
-            ],
-        },
-        {
-            keywordId: 3,
-            mmUserId: "user_xyz987",
-            keyword: "운동",
-            isDeleted: 0,
-            keywordCreated: "2024-05-22 18:00:00",
-            tasks: [], // 할 일이 없는 경우 (빈 배열)
-        },
-    ];
+
     const [todoData,setTodoData] = useImmer<TodoKeywordResponse[]>([]);
     const [newKeyword, setNewKeyword] = useState('');
     const getInitData = async () => {
@@ -107,7 +50,7 @@ export default function TodoContainer(){
         const response = await createTask(keyword, content);
         console.log(response);
         if(response.status === "SUCCESS" && (response.data.result === 1 || response.data.result === 2)){
-            const todoAddTaskParam = response.data.todoAddTaskParams;
+            //const todoAddTaskParam = response.data.todoAddTaskParams;
             await getInitData();
         }
     }
