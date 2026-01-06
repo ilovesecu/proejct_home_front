@@ -1,10 +1,10 @@
-import type {MenuItem} from "../../types/menu.ts";
+import type {MenuItem, SubMenuItem} from "../../types/menu.ts";
 import {NavLink} from "react-router-dom";
-import {Bell, BookOpen, Flag, Grid, Menu, MessageSquare, Paperclip, ShoppingCart, Users} from "lucide-react";
+import {Bell, BookOpen, Flag, Grid, Menu, MessageSquare, Paperclip, ShoppingCart, Users, X} from "lucide-react";
 import {useState} from "react";
 
 interface Props{
-    menus: MenuItem
+    menus: MenuItem[]
 }
 
 export default function Navbar({menus}:Props){
@@ -45,7 +45,7 @@ export default function Navbar({menus}:Props){
                                         {menu.title}
                                         {menu.badge && (
                                             <span className="absolute-top-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border border-white">
-                                                {menu.badge === true ? 'N' : menu.badge}
+                                                {menu.badge}
                                             </span>
                                         )}
                                         {menu.subMenu && <span className="text-[10px] opacity-40">▼</span>}
@@ -54,7 +54,7 @@ export default function Navbar({menus}:Props){
                                     {/* 서브 메뉴 드롭다운 (인프런 스타일의 깔끔한 박스) */}
                                     {menu.subMenu && (
                                         <div className="absolute top-[64px] left-0 hidden group-hover:block w-48 bg-white border border-gray-100 shadow-xl rounded-b-lg py-2 transition-all">
-                                            {menu.subMenu.map((sub) => (
+                                            {menu.subMenu.map((sub:SubMenuItem) => (
                                                 <NavLink
                                                     key={sub.id}
                                                     to={sub.link}

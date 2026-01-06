@@ -31,7 +31,7 @@ export const fetchMenuItems = async ():Promise<MenuItem[]> => {
     //const response = await client.get<ApiResponse<unknown>>('/menu');
     return [
         { id: 1, title: '강의', link: '/courses', iconName: 'lecture', contentName:'lecture' },
-        { id: 2, title: '챌린지', link: '/challenge', iconName: 'challenge', badge: 'N', contentName:'chanllenge' },
+        { id: 2, title: '챌린지', link: '/challenge', iconName: 'challenge', badge: 'N', contentName:'challenge' },
         { id: 3, title: '커뮤니티', link: '/community', iconName: 'community', contentName:'community' },
         {
             id:4,
