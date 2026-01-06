@@ -9,8 +9,20 @@ import {
     useState
 } from "react";
 
+//보드관련
+export interface Board{
+    id: string;
+    title: string;
+    goal: string;
+    placedStickers: PlacedStickersType;
+    status: 'in-progress' | 'completed';
+    createdAt: string;
+    totalSlot:number;
+}
+
+
 interface PlacedStickersType {
-    [key:number]:string;
+    [key:number]:string; //Record<number, string>
 }
 interface MousePosType {
     x:number;
@@ -22,6 +34,12 @@ interface StickerType {
 }
 
 interface PraiseStickerContextType {
+    boards: Board[];
+    currentBoardId: string | null;
+    setCurrentBoardId: (id: string) => void;
+    createNewBoard: (title: string, goal: string) => void;
+    updateSticker: (slotId: number) => void;
+
     STICKERS: StickerType[];
     TOTAL_SLOTS:number;
     selectedSticker:string;
@@ -41,6 +59,56 @@ const PraiseStickerContext = createContext<PraiseStickerContextType | undefined>
 
 
 export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
+    const [boards, setBoards] = useState<Board[]>([]);
+    const [currentBoardId, setCurrentBoardId] = useState<string | null>(null);
+
+    //현재 선택된 보드
+    const activeBoard = useMemo(()=>
+        boards.find(b => b.id === currentBoardId) || null
+    ,[boards, currentBoardId]);
+
+    //새로운 보드판
+    const createNewBoard = (title:string, goal:string, totalSlot:number) => {
+        const newBoard:Board = {
+            id: Date.now().toString(),
+            title: title || `${boards.length + 1}번째 보드판`,
+            goal: goal || "기본 목표",
+            placedStickers: {},
+            status: 'in-progress',
+            createdAt: Date.now().toString(),
+        };
+        setBoards(prev => [...prev, newBoard]);
+        setCurrentBoardId(newBoard.id);
+    }
+
+    // 현재 보드에 스티커 업데이트
+    const updateSticker = (slotId: number) => {
+        if (!currentBoardId) return;
+
+        setBoards(prev => prev.map(board => {
+            if (board.id === currentBoardId) {
+                const nextStickers = { ...board.placedStickers, [slotId]: selectedSticker };
+                // 25개가 다 차면 완료 상태로 변경
+                const isFinished = Object.keys(nextStickers).length === 25;
+                return {
+                    ...board,
+                    placedStickers: nextStickers,
+                    status: isFinished ? 'completed' : board.status
+                };
+            }
+            return board;
+        }));
+        playPopSound();
+    };
+
+    // 초기 보드 생성 (데이터가 하나도 없을 때)
+    useEffect(() => {
+        if (boards.length === 0) {
+            createNewBoard("첫 번째 칭찬판", "스스로 정리정돈 하기 ✨");
+        }
+    }, []);
+
+
     const STICKERS = useMemo(()=>{
         return [
             { id: 'bear', url: 'https://cdn-icons-png.flaticon.com/512/4392/4392471.png' },
