@@ -23,7 +23,7 @@ export default function Navbar({menus}:Props){
     };
 
     return (
-        <nav className="fixed top-0 w-full h-16 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <nav className="fixed top-0 w-full h-16 bg-white/80 backdrop-blur-md border-b border-gray-100 z-50">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
 
