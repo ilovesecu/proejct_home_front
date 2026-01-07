@@ -35,17 +35,17 @@ interface StickerType {
 
 interface PraiseStickerContextType {
     boards: Board[];
+    activeBoard: Board | null;
     currentBoardId: string | null;
     setCurrentBoardId: (id: string) => void;
-    createNewBoard: (title: string, goal: string) => void;
-    updateSticker: (slotId: number) => void;
+    createNewBoard: (title: string, goal: string, totalSlot:number) => void;
 
     STICKERS: StickerType[];
-    TOTAL_SLOTS:number;
+    //TOTAL_SLOTS:number;
     selectedSticker:string;
     setSelectedSticker:Dispatch<SetStateAction<string>>;
-    placedStickers:PlacedStickersType;
-    setPlacedStickers:Dispatch<SetStateAction<PlacedStickersType>>;
+    //placedStickers:PlacedStickersType;
+    //setPlacedStickers:Dispatch<SetStateAction<PlacedStickersType>>;
     mousePos:MousePosType;
     setMousePos:Dispatch<SetStateAction<MousePosType>>;
     showCelebration:boolean;
@@ -70,44 +70,18 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     //새로운 보드판
     const createNewBoard = (title:string, goal:string, totalSlot:number) => {
         const newBoard:Board = {
-            id: Date.now().toString(),
+            id: new Date().toISOString(),
             title: title || `${boards.length + 1}번째 보드판`,
             goal: goal || "기본 목표",
             placedStickers: {},
             status: 'in-progress',
-            createdAt: Date.now().toString(),
+            createdAt: new Date().toISOString(),
+            totalSlot : totalSlot || 25,
         };
         setBoards(prev => [...prev, newBoard]);
         setCurrentBoardId(newBoard.id);
+        setShowCelebration(false); // 새 보드판은 축하 효과 리셋
     }
-
-    // 현재 보드에 스티커 업데이트
-    const updateSticker = (slotId: number) => {
-        if (!currentBoardId) return;
-
-        setBoards(prev => prev.map(board => {
-            if (board.id === currentBoardId) {
-                const nextStickers = { ...board.placedStickers, [slotId]: selectedSticker };
-                // 25개가 다 차면 완료 상태로 변경
-                const isFinished = Object.keys(nextStickers).length === 25;
-                return {
-                    ...board,
-                    placedStickers: nextStickers,
-                    status: isFinished ? 'completed' : board.status
-                };
-            }
-            return board;
-        }));
-        playPopSound();
-    };
-
-    // 초기 보드 생성 (데이터가 하나도 없을 때)
-    useEffect(() => {
-        if (boards.length === 0) {
-            createNewBoard("첫 번째 칭찬판", "스스로 정리정돈 하기 ✨");
-        }
-    }, []);
-
 
     const STICKERS = useMemo(()=>{
         return [
@@ -117,10 +91,10 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
             { id: 'dog', url: 'https://cdn-icons-png.flaticon.com/512/4392/4392515.png' },
         ];
     },[])
-    const TOTAL_SLOTS = 25;
+    //const TOTAL_SLOTS = 25;
 
     const [selectedSticker, setSelectedSticker] = useState<string>(STICKERS[0].url);
-    const [placedStickers, setPlacedStickers] = useState<PlacedStickersType>({});
+    //const [placedStickers, setPlacedStickers] = useState<PlacedStickersType>({});
     const [mousePos, setMousePos] = useState<MousePosType>({ x: -100, y: -100 });
     const [showCelebration, setShowCelebration] = useState(false);
     //보드판 위에 있는지 확인
@@ -140,30 +114,53 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
         return () => window.removeEventListener('mousemove', handleMouseMove);
     }, []);
 
-    // 25개 완성 체크
+    // 초기 보드 생성 (데이터가 하나도 없을 때)
     useEffect(() => {
-        if (Object.keys(placedStickers).length === TOTAL_SLOTS) {
-            setShowCelebration(true);
-            // 축하 사운드 추가 가능
-            const fanfare = new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3');
-            fanfare.play();
+        if (boards.length === 0) {
+            createNewBoard("첫 번째 칭찬판1", "스스로 정리정돈 하기 ✨", 25);
         }
-    }, [placedStickers]);
+    }, []);
 
-    const handleSlotClick = (id:number) => {
+    //스티커 업데이트
+    const handleSlotClick = (slotId:number) => {
+        if (!currentBoardId || !activeBoard) return;
         // 이미 찍힌 곳이어도 다시 찍을 수 있게 하거나, 사운드를 위해 호출
         playPopSound();
-        setPlacedStickers((prev) => ({ ...prev, [id]: selectedSticker }));
+
+        setBoards(prev => prev.map(board => {
+            if(board.id === currentBoardId){
+                const nextStickers = {...board.placedStickers, [slotId]: selectedSticker};
+                // 해당 보드의 totalSlot 기준으로 완료 체크
+                const isFinished = Object.keys(nextStickers).length === board.totalSlot;
+
+                if(isFinished){
+                    setShowCelebration(true);
+                    new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3').play();
+                }
+                return {
+                    ...board,
+                    placedStickers: nextStickers,
+                    status: isFinished ? 'completed' : board.status,
+                }
+            }
+            return board;
+        }));
+
+        //setPlacedStickers((prev) => ({ ...prev, [id]: selectedSticker }));
     };
 
     return (
         <PraiseStickerContext.Provider value={{
+            boards,
+            activeBoard,
+            currentBoardId,
+            setCurrentBoardId,
+            createNewBoard,
+
             STICKERS,
-            TOTAL_SLOTS,
+            //TOTAL_SLOTS,
             selectedSticker,
             setSelectedSticker,
-            placedStickers,
-            setPlacedStickers,
             mousePos,
             setMousePos,
             showCelebration,

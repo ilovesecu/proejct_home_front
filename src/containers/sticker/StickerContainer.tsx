@@ -2,6 +2,7 @@ import {CustomMouse} from "../../components/sticker/CustomMouse.tsx";
 import EndOverlay from "../../components/sticker/EndOverlay.tsx";
 import {usePraiseSticker} from "../../context/PraiseStickerContext.tsx";
 import MainBoard from "../../components/sticker/MainBoard.tsx";
+import BoardArchive from "../../components/sticker/BoardArchive.tsx";
 
 
 
@@ -27,7 +28,7 @@ const PraiseStickerBoard = () => {
 
             {/* 3. 메인 보드 */}
             <MainBoard/>
-
+            <BoardArchive/>
             <style>{`
                 @keyframes stamp {
                   0% { transform: scale(3) rotate(20deg); opacity: 0; }
