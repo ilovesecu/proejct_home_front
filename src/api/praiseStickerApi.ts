@@ -1,13 +1,13 @@
 import {client} from "./client.ts";
 import type {ApiResponse} from "../types/api.ts";
-import type {Board, BoardResponse, StickerStampRequest} from "../types/PraiseSticker.ts";
+import type {BoardCreateRequest, BoardResponse, PlacedSticker, StickerStampRequest} from "../types/PraiseSticker.ts";
 
-export const createBoard = async (newBoard : Board) => {
-    return await client.post<ApiResponse<unknown>>('/praise/board', newBoard);
+export const createBoard = async (newBoard : BoardCreateRequest) => {
+    return await client.post<ApiResponse<BoardResponse>>('/praise/board', newBoard);
 }
 
 export const stampBaord = async (param:StickerStampRequest) => {
-    return await client.post<ApiResponse<unknown>>('/praise/sticker', param);
+    return await client.post<ApiResponse<PlacedSticker>>('/praise/sticker', param);
 }
 
 export const getBoardSticker = async () => {

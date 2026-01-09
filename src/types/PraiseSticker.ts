@@ -34,6 +34,13 @@ export type BoardResponse = Omit<Board, 'placedStickers'> & {
     placedStickers: PlacedSticker[]; // 이름에 맞게 배열로 설정
 };
 
+export interface BoardCreateRequest{
+    title:string;
+    goal:string;
+    totalSlots:number;
+    rewardItem:string;
+}
+
 /*
 결론부터 말씀드리면, 규모가 있는 프로젝트나 객체 지향적인 설계를 지향한다면 **API Response Type(DTO)**과 **UI State Type(Model/ViewModel)**을 **분리하여 서로 변환(Mapping)**하는 것이 훨씬 권장되는 방식입니다.
 
@@ -49,7 +56,8 @@ export type BoardResponse = Omit<Board, 'placedStickers'> & {
 의존성 분리: 백엔드 API 구조가 살짝 바뀌더라도 프론트엔드 전체 코드를 고치는 대신, 데이터를 변환하는 Mapper 함수만 수정하면 됩니다.
 */
 
-export const boardResponseConvert = (boardResponseArray:BoardResponse[]) => {
+export const convertBoardResponse = (boardResponseArray:BoardResponse[]) => {
+    if(!boardResponseArray || boardResponseArray.length === 0)return [];
     const formattedBoards: Board[] = boardResponseArray.map((board:BoardResponse) => ({
         id: board.id,
         title: board.title,
@@ -62,7 +70,7 @@ export const boardResponseConvert = (boardResponseArray:BoardResponse[]) => {
         completedAt: board.completedAt,
 
         // 중요: 배열 형태를 { slotId: { url, stampedAt } } 객체 형태로 변환
-        placedStickers: board.placedStickers.reduce((acc:PlacedStickersType, s) => {
+        /*placedStickers: board.placedStickers.reduce((acc:PlacedStickersType, s) => {
             if (s.slotId) { // 스티커가 있는 경우만 추가
                 acc[s.slotId] = {
                     stickerUrl: s.stickerUrl,
@@ -73,8 +81,40 @@ export const boardResponseConvert = (boardResponseArray:BoardResponse[]) => {
                 };
             }
             return acc;
-        }, {})
+        }, {})*/
+        placedStickers: convertPlacedStickers(board.placedStickers),
     }));
-
     return formattedBoards;
+}
+export const convertBoardResponseOne = (boardResponse:BoardResponse):Board=>{
+    return {
+        id: boardResponse.id,
+        title: boardResponse.title,
+        goal: boardResponse.goal,
+        rewardItem: boardResponse.rewardItem,
+        rewarded: boardResponse.rewarded,
+        status: boardResponse.status,
+        totalSlots: boardResponse.totalSlots,
+        createdAt: boardResponse.createdAt,
+        completedAt: boardResponse.completedAt,
+
+        placedStickers: convertPlacedStickers(boardResponse.placedStickers)
+    }
+}
+
+export const convertPlacedStickers = (placedStickers:PlacedSticker[]) => {
+    if(!placedStickers || placedStickers.length === 0) return {};
+
+    return placedStickers.reduce((acc:PlacedStickersType, s) => {
+        if (s.slotId) { // 스티커가 있는 경우만 추가
+            acc[s.slotId] = {
+                stickerUrl: s.stickerUrl,
+                stampedAt: s.stampedAt,
+                nickname: s.nickname,
+                boardId: s.boardId,
+                slotId: s.slotId,
+            };
+        }
+        return acc;
+    }, {})
 }

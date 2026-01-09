@@ -4,7 +4,7 @@ import { usePraiseSticker } from '../../context/PraiseStickerContext';
 
 const BoardArchive = () => {
     const { boards, currentBoardId, setCurrentBoardId, createNewBoard } = usePraiseSticker();
-    const [activeTab, setActiveTab] = useState<'in-progress' | 'completed'>('in-progress');
+    const [activeTab, setActiveTab] = useState<'IN_PROGRESS' | 'COMPLETED'>('IN_PROGRESS');
 
     const filteredBoards = boards.filter(b => b.status === activeTab);
 
@@ -13,7 +13,7 @@ const BoardArchive = () => {
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">📁 보드판 보관함</h2>
                 <button
-                    onClick={() => createNewBoard("", "", 25)} // 새 보드판 생성
+                    onClick={() => createNewBoard("택시 타지 않기", "TEST", 30, "기본보상(나의사랑)")} // 새 보드판 생성
                     className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
                 >
                     + 새 보드판 만들기
@@ -22,7 +22,7 @@ const BoardArchive = () => {
 
             {/* 탭 메뉴 */}
             <div className="flex gap-4 border-b border-gray-100 mb-6">
-                {['in-progress', 'completed'].map((tab) => (
+                {['IN_PROGRESS', 'COMPLETED'].map((tab) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab as any)}

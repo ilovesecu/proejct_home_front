@@ -9,7 +9,11 @@ import {
     useState
 } from "react";
 import {createBoard, getBoardSticker, stampBaord} from "../api/praiseStickerApi.ts";
-import {type Board, boardResponseConvert} from "../types/PraiseSticker.ts";
+import {
+    type Board,
+    convertBoardResponse,
+    convertBoardResponseOne
+} from "../types/PraiseSticker.ts";
 
 
 interface MousePosType {
@@ -71,7 +75,7 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
 
     //새로운 보드판
     const createNewBoard = async (title:string, goal:string, totalSlots:number, rewardItem:string) => {
-        const newBoard:Board = {
+        /*const newBoard:Board = {
             id: 2,
             title: title || `${boards.length + 1}번째 보드판`,
             goal: goal || "기본 목표",
@@ -82,8 +86,14 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
             rewardItem: rewardItem || '기본보상(나의 사랑)',
             rewarded:false,
             completedAt:'',
+        };*/
+        const boardCreateReuqest = {
+            title, goal, totalSlots, rewardItem
         };
-        //await createBoard(newBoard);
+        const response = await createBoard(boardCreateReuqest);
+        const newBoardResponse = response.data;
+        const newBoard = convertBoardResponseOne(newBoardResponse);
+
         setBoards(prev => [...prev, newBoard]);
         setCurrentBoardId(newBoard.id);
         setShowCelebration(false); // 새 보드판은 축하 효과 리셋
@@ -92,11 +102,11 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     //보드, 스티커 정보 가져오기
     const fetchBoardStickers = async () => {
         const response = await getBoardSticker();
-        console.log(response);
+        const formattedBoards = convertBoardResponse(response.data);
 
-        const formattedBoards = boardResponseConvert(response.data);
+        const currentId = formattedBoards?.[0]?.id ;
         setBoards(formattedBoards);
-        console.log(formattedBoards);
+        setCurrentBoardId(currentId);//맨 마지막 보드판을 현재 보드판으로 설정해준다.
     }
 
     // 사운드 재생 함수 (무료 'Pop' 사운드 주소)
@@ -115,9 +125,9 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
 
     // 초기 보드 생성 (데이터가 하나도 없을 때)
     useEffect(() => {
-        if (boards.length === 0) {
+        /*if (boards.length === 0) {
             createNewBoard("첫 번째 칭찬판1", "스스로 정리정돈 하기 ✨", 25, 'BASIC BONUS');
-        }
+        }*/
         fetchBoardStickers();
     }, []);
 
@@ -133,15 +143,15 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
             stickerUrl: selectedSticker,
         }
         const responseData = await stampBaord(params);
-        if(responseData.status === 'SUCCESS'){
+        if(responseData.status === 'SUCCESS' && responseData.data){
             setBoards(prev => prev.map(board => {
                 if(board.id === currentBoardId){
                     const nextStickers = {...board.placedStickers,
                         [slotId]: {
-                            stickerUrl:selectedSticker,
-                            boardId:board.id,
-                            stampedAt:new Date().toISOString(),
-                            nickname:'TESTER',
+                            stickerUrl:responseData.data.stickerUrl,
+                            boardId:responseData.data.boardId,
+                            stampedAt:responseData.data.stampedAt,
+                            nickname:responseData.data.nickname,
                             slotId:slotId,
                     }};
                     // 해당 보드의 totalSlot 기준으로 완료 체크
@@ -160,7 +170,6 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
                 return board;
             }));
         }
-        //setPlacedStickers((prev) => ({ ...prev, [id]: selectedSticker }));
     };
 
     return (
