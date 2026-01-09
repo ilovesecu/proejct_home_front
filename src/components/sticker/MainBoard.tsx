@@ -11,7 +11,7 @@ const MainBoard = () => {
 
             {/* 그리드 보드 */}
             <div className="p-10 grid grid-cols-5 gap-6 bg-[radial-gradient(#fef3c7_1px,transparent_1px)] [background-size:20px_20px]">
-                {[...Array(activeBoard?.totalSlot)].map((_, i) => {
+                {[...Array(activeBoard?.totalSlots)].map((_, i) => {
                     const slotId = i + 1;
                     return (
                         <div
@@ -22,7 +22,7 @@ const MainBoard = () => {
                             <span className="text-gray-100 font-black text-3xl select-none">{slotId}</span>
                             {activeBoard?.placedStickers[slotId] && (
                                 <img
-                                    src={activeBoard?.placedStickers[slotId]}
+                                    src={activeBoard?.placedStickers[slotId].stickerUrl}
                                     className="absolute w-[85%] h-[85%] animate-stamp"
                                     alt="stamped"
                                 />

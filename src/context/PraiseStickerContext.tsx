@@ -8,22 +8,10 @@ import {
     useMemo,
     useState
 } from "react";
-
-//보드관련
-export interface Board{
-    id: string;
-    title: string;
-    goal: string;
-    placedStickers: PlacedStickersType;
-    status: 'in-progress' | 'completed';
-    createdAt: string;
-    totalSlot:number;
-}
+import {createBoard, getBoardSticker, stampBaord} from "../api/praiseStickerApi.ts";
+import {type Board, boardResponseConvert} from "../types/PraiseSticker.ts";
 
 
-interface PlacedStickersType {
-    [key:number]:string; //Record<number, string>
-}
 interface MousePosType {
     x:number;
     y:number;
@@ -36,16 +24,13 @@ interface StickerType {
 interface PraiseStickerContextType {
     boards: Board[];
     activeBoard: Board | null;
-    currentBoardId: string | null;
-    setCurrentBoardId: (id: string) => void;
-    createNewBoard: (title: string, goal: string, totalSlot:number) => void;
+    currentBoardId: number;
+    setCurrentBoardId: (id: number) => void;
+    createNewBoard: (title: string, goal: string, totalSlots:number, rewardItem:string) => void;
 
     STICKERS: StickerType[];
-    //TOTAL_SLOTS:number;
     selectedSticker:string;
     setSelectedSticker:Dispatch<SetStateAction<string>>;
-    //placedStickers:PlacedStickersType;
-    //setPlacedStickers:Dispatch<SetStateAction<PlacedStickersType>>;
     mousePos:MousePosType;
     setMousePos:Dispatch<SetStateAction<MousePosType>>;
     showCelebration:boolean;
@@ -60,28 +45,7 @@ const PraiseStickerContext = createContext<PraiseStickerContextType | undefined>
 
 export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     const [boards, setBoards] = useState<Board[]>([]);
-    const [currentBoardId, setCurrentBoardId] = useState<string | null>(null);
-
-    //현재 선택된 보드
-    const activeBoard = useMemo(()=>
-        boards.find(b => b.id === currentBoardId) || null
-    ,[boards, currentBoardId]);
-
-    //새로운 보드판
-    const createNewBoard = (title:string, goal:string, totalSlot:number) => {
-        const newBoard:Board = {
-            id: new Date().toISOString(),
-            title: title || `${boards.length + 1}번째 보드판`,
-            goal: goal || "기본 목표",
-            placedStickers: {},
-            status: 'in-progress',
-            createdAt: new Date().toISOString(),
-            totalSlot : totalSlot || 25,
-        };
-        setBoards(prev => [...prev, newBoard]);
-        setCurrentBoardId(newBoard.id);
-        setShowCelebration(false); // 새 보드판은 축하 효과 리셋
-    }
+    const [currentBoardId, setCurrentBoardId] = useState<number>(0);
 
     const STICKERS = useMemo(()=>{
         return [
@@ -100,6 +64,41 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     //보드판 위에 있는지 확인
     const [isHoveringBoard, setIsHoveringBoard] = useState(false);
 
+    //현재 선택된 보드
+    const activeBoard = useMemo(()=>
+        boards.find(b => b.id === currentBoardId) || null
+    ,[boards, currentBoardId]);
+
+    //새로운 보드판
+    const createNewBoard = async (title:string, goal:string, totalSlots:number, rewardItem:string) => {
+        const newBoard:Board = {
+            id: 2,
+            title: title || `${boards.length + 1}번째 보드판`,
+            goal: goal || "기본 목표",
+            placedStickers: {},
+            status: 'IN_PROGRESS',
+            createdAt: new Date().toISOString(),
+            totalSlots : totalSlots || 25,
+            rewardItem: rewardItem || '기본보상(나의 사랑)',
+            rewarded:false,
+            completedAt:'',
+        };
+        //await createBoard(newBoard);
+        setBoards(prev => [...prev, newBoard]);
+        setCurrentBoardId(newBoard.id);
+        setShowCelebration(false); // 새 보드판은 축하 효과 리셋
+    }
+
+    //보드, 스티커 정보 가져오기
+    const fetchBoardStickers = async () => {
+        const response = await getBoardSticker();
+        console.log(response);
+
+        const formattedBoards = boardResponseConvert(response.data);
+        setBoards(formattedBoards);
+        console.log(formattedBoards);
+    }
+
     // 사운드 재생 함수 (무료 'Pop' 사운드 주소)
     const playPopSound = () => {
         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
@@ -117,35 +116,50 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     // 초기 보드 생성 (데이터가 하나도 없을 때)
     useEffect(() => {
         if (boards.length === 0) {
-            createNewBoard("첫 번째 칭찬판1", "스스로 정리정돈 하기 ✨", 25);
+            createNewBoard("첫 번째 칭찬판1", "스스로 정리정돈 하기 ✨", 25, 'BASIC BONUS');
         }
+        fetchBoardStickers();
     }, []);
 
     //스티커 업데이트
-    const handleSlotClick = (slotId:number) => {
+    const handleSlotClick = async (slotId:number) => {
         if (!currentBoardId || !activeBoard) return;
         // 이미 찍힌 곳이어도 다시 찍을 수 있게 하거나, 사운드를 위해 호출
         playPopSound();
 
-        setBoards(prev => prev.map(board => {
-            if(board.id === currentBoardId){
-                const nextStickers = {...board.placedStickers, [slotId]: selectedSticker};
-                // 해당 보드의 totalSlot 기준으로 완료 체크
-                const isFinished = Object.keys(nextStickers).length === board.totalSlot;
+        const params = {
+            boardId: currentBoardId,
+            slotId,
+            stickerUrl: selectedSticker,
+        }
+        const responseData = await stampBaord(params);
+        if(responseData.status === 'SUCCESS'){
+            setBoards(prev => prev.map(board => {
+                if(board.id === currentBoardId){
+                    const nextStickers = {...board.placedStickers,
+                        [slotId]: {
+                            stickerUrl:selectedSticker,
+                            boardId:board.id,
+                            stampedAt:new Date().toISOString(),
+                            nickname:'TESTER',
+                            slotId:slotId,
+                    }};
+                    // 해당 보드의 totalSlot 기준으로 완료 체크
+                    const isFinished = Object.keys(nextStickers).length === board.totalSlots;
 
-                if(isFinished){
-                    setShowCelebration(true);
-                    new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3').play();
+                    if(isFinished){
+                        setShowCelebration(true);
+                        new Audio('https://assets.mixkit.co/active_storage/sfx/2018/2018-preview.mp3').play();
+                    }
+                    return {
+                        ...board,
+                        placedStickers: nextStickers,
+                        status: isFinished ? 'COMPLETED' : board.status,
+                    }
                 }
-                return {
-                    ...board,
-                    placedStickers: nextStickers,
-                    status: isFinished ? 'completed' : board.status,
-                }
-            }
-            return board;
-        }));
-
+                return board;
+            }));
+        }
         //setPlacedStickers((prev) => ({ ...prev, [id]: selectedSticker }));
     };
 
