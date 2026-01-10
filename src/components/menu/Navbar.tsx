@@ -1,5 +1,5 @@
 import type {MenuItem, SubMenuItem} from "../../types/menu.ts";
-import {NavLink} from "react-router-dom";
+import {NavLink, useNavigate} from "react-router-dom";
 import {Bell, BookOpen, Flag, Grid, Menu, MessageSquare, Paperclip, ShoppingCart, Users, X} from "lucide-react";
 import {useState} from "react";
 
@@ -9,6 +9,7 @@ interface Props{
 
 export default function Navbar({menus}:Props){
     const [isOpen, setIsOpen] = useState(false);
+    const navigate = useNavigate();
 
     // 아이콘 매핑 함수 (데이터베이스에서 이름으로 올 경우 대비)
     const getIcon = (name?: string) => {
@@ -79,7 +80,7 @@ export default function Navbar({menus}:Props){
                                 <ShoppingCart size={20} className="text-gray-400 cursor-pointer hover:text-gray-600" />
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] px-1.5 rounded-full">9+</span>
                             </div>
-                            <div className="relative">
+                            <div className="relative" onClick={()=>navigate('/login')}>
                                 <div className="w-8 h-8 bg-gray-200 rounded-full border border-gray-100 cursor-pointer"></div>
                                 <span className="absolute top-0 right-0 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
                             </div>

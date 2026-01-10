@@ -1,6 +1,7 @@
 import React from "react";
 import TodoPage from "../pages/TodoPage.tsx";
 import PraiseStickerPage from "../pages/PraiseStickerPage.tsx";
+import LoginPage from "../pages/LoginPage.tsx";
 
 export const ComponentRegistry:Record<string, React.FC> = {
     lecture: () => <div>준비중</div>,
@@ -9,4 +10,5 @@ export const ComponentRegistry:Record<string, React.FC> = {
     playground:() => <div>준비중</div>,
     todoKeyword: TodoPage,
     praiseSticker: PraiseStickerPage,
+    login: LoginPage,
 }

@@ -36,6 +36,7 @@ const AppRoutes = () => {
                 ))}
                 {/* 기본 경로 설정 */}
                 <Route path="/" element={React.createElement(ComponentRegistry['todoKeyword'])} />
+                <Route path="/login" element={React.createElement(ComponentRegistry['login'])} />
             </Route>
         </Routes>
     )
