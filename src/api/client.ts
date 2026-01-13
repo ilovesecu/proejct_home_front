@@ -35,8 +35,8 @@ client.interceptors.response.use(
         const originalRequest = error.config;
 
         //onRejected - 실패
-        // TODO accessToken 만료 코드 정하기
-        if(error.response && error.response.status === 401 && !originalRequest._retry){
+        console.log(error);
+        if(error.response && error.response.data.code === 'TOKEN_001' && !originalRequest._retry){
             originalRequest._retry = true; // 무한 루프 방지용 플래그 설정(한번만 시도 후 안되면 포기)
             console.error('로그인 필요!');
             try{

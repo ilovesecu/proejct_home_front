@@ -13,3 +13,7 @@ export const stampBaord = async (param:StickerStampRequest) => {
 export const getBoardSticker = async () => {
     return await client.get<ApiResponse<BoardResponse[]>>('/praise/boardSticker');
 }
+
+export const helloApi = async () => {
+    return await client.get('/guest/hello');
+}

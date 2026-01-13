@@ -8,7 +8,7 @@ import {
     useMemo,
     useState
 } from "react";
-import {createBoard, getBoardSticker, stampBaord} from "../api/praiseStickerApi.ts";
+import {createBoard, getBoardSticker, helloApi, stampBaord} from "../api/praiseStickerApi.ts";
 import {
     type Board,
     convertBoardResponse,
@@ -129,7 +129,14 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
             createNewBoard("첫 번째 칭찬판1", "스스로 정리정돈 하기 ✨", 25, 'BASIC BONUS');
         }*/
         fetchBoardStickers();
+        test();
     }, []);
+
+    const test = async ()=>{
+        //TODO 연속 API 호출 TEST
+        const testResponse = await helloApi();
+        console.log(testResponse);
+    }
 
     //스티커 업데이트
     const handleSlotClick = async (slotId:number) => {
