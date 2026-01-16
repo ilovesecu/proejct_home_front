@@ -21,3 +21,24 @@ export interface DefaultPopupLayoutProps {
 // T는 닫힐 때 반환할 데이터의 타입
 export type CustomContentGenerator<T = void> = (close: (result?: T) => void) => ReactNode;
 
+export interface PopupItem{
+    id: number; //key Porps를 위해 추가
+    type: PopupType,
+    title?:string;
+    message?:ReactNode;
+    content?:ReactNode | CustomContentGenerator; //커스텀용
+    resolve: (value:any) => void; //Promise Resolve용
+}
+
+export interface GlobalPopupContextType {
+    fireAlert: (message: ReactNode, title?: string) => Promise<boolean>;
+    fireConfirm: (message: ReactNode, title?: string) => Promise<boolean>;
+    // 제네릭 <T>를 사용하여 반환 타입을 지정할 수 있게 함
+    fireCustom: <T = any>(content: ReactNode | CustomContentGenerator<T>) => Promise<T | undefined>;
+}
+
+
+export interface PopupRendererProps {
+    item: PopupItem,
+    onClose: () => void;
+}

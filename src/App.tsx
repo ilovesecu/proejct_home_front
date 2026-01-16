@@ -3,6 +3,7 @@ import MainLayout from "./components/layout/MainLayout.tsx";
 import {MenuProvider, useMenu} from "./context/MenuContext.tsx";
 import React, {useMemo} from "react";
 import {ComponentRegistry} from "./routes/ComponentRegistry.tsx";
+import {GlobalPopupProvider} from "./context/PopupContext.tsx";
 
 //실제 라우트 정보를 설정하는 내부 컴포넌트
 const AppRoutes = () => {
@@ -25,20 +26,22 @@ const AppRoutes = () => {
 
     if(loading) return <div>Menu Loading...</div>;
     return (
-        <Routes>
-            <Route element={<MainLayout/>}>
-                {allRoutes.map((route) => (
-                    <Route
-                        key={route.path}
-                        path={route.path}
-                        element={React.createElement(ComponentRegistry[route.contentName])}
-                    />
-                ))}
-                {/* 기본 경로 설정 */}
-                <Route path="/" element={React.createElement(ComponentRegistry['todoKeyword'])} />
-                <Route path="/login" element={React.createElement(ComponentRegistry['login'])} />
-            </Route>
-        </Routes>
+        <GlobalPopupProvider>
+            <Routes>
+                <Route element={<MainLayout/>}>
+                    {allRoutes.map((route) => (
+                        <Route
+                            key={route.path}
+                            path={route.path}
+                            element={React.createElement(ComponentRegistry[route.contentName])}
+                        />
+                    ))}
+                    {/* 기본 경로 설정 */}
+                    <Route path="/" element={React.createElement(ComponentRegistry['todoKeyword'])} />
+                    <Route path="/login" element={React.createElement(ComponentRegistry['login'])} />
+                </Route>
+            </Routes>
+        </GlobalPopupProvider>
     )
 }
 
