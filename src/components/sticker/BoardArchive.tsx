@@ -1,19 +1,33 @@
 // BoardArchive.tsx
 import { useState } from 'react';
 import { usePraiseSticker } from '../../context/PraiseStickerContext';
+import {usePopup} from "../../context/PopupContext.tsx";
+import CreateBoardPopup from "./CreateBoardPopup.tsx";
 
 const BoardArchive = () => {
     const { boards, currentBoardId, setCurrentBoardId, createNewBoard } = usePraiseSticker();
     const [activeTab, setActiveTab] = useState<'IN_PROGRESS' | 'COMPLETED'>('IN_PROGRESS');
-
     const filteredBoards = boards.filter(b => b.status === activeTab);
+    const {fireCustom} = usePopup();
+
+    const handleOpenCreatePopup = async () => {
+
+        const result = await fireCustom((close) => (
+            <CreateBoardPopup onClose={close} createNewBoard={createNewBoard} />
+        ));
+
+        if (result) {
+            console.log("보드판이 성공적으로 생성되었습니다.");
+            // 필요 시 추가적인 알림(fireAlert) 등을 띄울 수 있습니다.
+        }
+    }
 
     return (
         <div className="w-full max-w-4xl mt-12 bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">📁 보드판 보관함</h2>
                 <button
-                    onClick={() => createNewBoard("택시 타지 않기", "TEST", 30, "기본보상(나의사랑)")} // 새 보드판 생성
+                    onClick={() => handleOpenCreatePopup()} // 새 보드판 생성
                     className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
                 >
                     + 새 보드판 만들기
