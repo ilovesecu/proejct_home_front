@@ -1,14 +1,14 @@
 import {usePraiseSticker} from "../../context/PraiseStickerContext.tsx";
 
 const MainBoardTop = () => {
-    const {STICKERS, setSelectedSticker, selectedSticker} = usePraiseSticker();
+    const {STICKERS, setSelectedSticker, selectedSticker, activeBoard} = usePraiseSticker();
 
     return (
         <>
             <div className="bg-yellow-100 p-8 text-center">
-                <h1 className="text-4xl font-black text-yellow-800 mb-2">어린이 칭찬판</h1>
+                <h1 className="text-4xl font-black text-yellow-800 mb-2">{activeBoard?.title || '기본'}</h1>
                 <div className="inline-block px-4 py-1 bg-white rounded-full text-yellow-600 font-bold shadow-sm">
-                    목표: 스스로 정리정돈 하기 ✨
+                    목표: {activeBoard?.goal || '스스로 정리정돈 하기(기본)'} ✨
                 </div>
             </div>
 

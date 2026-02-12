@@ -1,19 +1,35 @@
 // BoardArchive.tsx
 import { useState } from 'react';
 import { usePraiseSticker } from '../../context/PraiseStickerContext';
+import {usePopup} from "../../context/PopupContext.tsx";
+import BoardCreateForm from "./popup/BoardCreateForm.tsx";
 
 const BoardArchive = () => {
     const { boards, currentBoardId, setCurrentBoardId, createNewBoard } = usePraiseSticker();
     const [activeTab, setActiveTab] = useState<'IN_PROGRESS' | 'COMPLETED'>('IN_PROGRESS');
 
     const filteredBoards = boards.filter(b => b.status === activeTab);
+    const { fireCustom } = usePopup();
+
+    const createBoardPop = async () => {
+        // 팝업으로부터 폼 데이터를 직접 받아옴
+        await fireCustom<{
+            title: string;
+            goal: string;
+            totalSlots: number;
+            rewardItem: string;
+        } | null>((close) => (
+            <BoardCreateForm onClose={close} onSubmit={createNewBoard} />
+        ));
+    }
+
 
     return (
         <div className="w-full max-w-4xl mt-12 bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-xl font-bold text-gray-800">📁 보드판 보관함</h2>
                 <button
-                    onClick={() => createNewBoard("택시 타지 않기", "TEST", 30, "기본보상(나의사랑)")} // 새 보드판 생성
+                    onClick={() => createBoardPop()} // 새 보드판 생성
                     className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors"
                 >
                     + 새 보드판 만들기

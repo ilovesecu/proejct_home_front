@@ -18,7 +18,8 @@ const ModalLayout: React.FC<CustomModalProps> = ({isOpen, onOpen, onClose, child
 
     return ReactDOM.createPortal(
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+            // 부모 div에 bg-black/50 (또는 bg-black bg-opacity-50)을 추가합니다.
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
             onClick={onClose}
         >
             <div

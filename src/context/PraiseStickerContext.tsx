@@ -75,18 +75,6 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
 
     //새로운 보드판
     const createNewBoard = async (title:string, goal:string, totalSlots:number, rewardItem:string) => {
-        /*const newBoard:Board = {
-            id: 2,
-            title: title || `${boards.length + 1}번째 보드판`,
-            goal: goal || "기본 목표",
-            placedStickers: {},
-            status: 'IN_PROGRESS',
-            createdAt: new Date().toISOString(),
-            totalSlots : totalSlots || 25,
-            rewardItem: rewardItem || '기본보상(나의 사랑)',
-            rewarded:false,
-            completedAt:'',
-        };*/
         const boardCreateReuqest = {
             title, goal, totalSlots, rewardItem
         };
@@ -113,7 +101,7 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
     const playPopSound = () => {
         const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
         audio.volume = 0.5;
-        audio.play();
+        //audio.play();
     };
 
     // 마우스 이동 감지
