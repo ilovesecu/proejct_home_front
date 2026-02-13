@@ -30,6 +30,11 @@ export interface StickerStampRequest {
     stickerUrl:string;
 }
 
+export interface StickerDeleteRequest {
+    boardId:number;
+    slotIds:number[];
+}
+
 export type BoardResponse = Omit<Board, 'placedStickers'> & {
     placedStickers: PlacedSticker[]; // 이름에 맞게 배열로 설정
 };

@@ -8,7 +8,7 @@ import {
     useMemo,
     useState
 } from "react";
-import {createBoard, getBoardSticker, helloApi, stampBaord} from "../api/praiseStickerApi.ts";
+import {createBoard, deleteSticker, getBoardSticker, helloApi, stampBaord} from "../api/praiseStickerApi.ts";
 import {
     type Board,
     convertBoardResponse,
@@ -43,6 +43,7 @@ interface PraiseStickerContextType {
     setIsHoveringBoard:Dispatch<SetStateAction<boolean>>;
     playPopSound:()=>void;
     handleSlotClick:(id:number)=>void;
+    deleteStickers : (slotIds:number[]) => void;
 }
 const PraiseStickerContext = createContext<PraiseStickerContextType | undefined>(undefined);
 
@@ -167,6 +168,15 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
         }
     };
 
+    //스타커 일괄삭제
+    const deleteStickers = async (slotIds: number[]) => {
+        if(!currentBoardId) return ;
+        const deleteResponse = await deleteSticker({boardId:currentBoardId, slotIds});
+        console.log(deleteResponse);
+    }
+
+    //스티커 일괄 이미지 변경
+
     return (
         <PraiseStickerContext.Provider value={{
             boards,
@@ -186,7 +196,8 @@ export const PraiseStickerProvider = ({children}:{children:ReactNode}) => {
             isHoveringBoard,
             setIsHoveringBoard,
             playPopSound,
-            handleSlotClick
+            handleSlotClick,
+            deleteStickers
         }}>
             {children}
         </PraiseStickerContext.Provider>

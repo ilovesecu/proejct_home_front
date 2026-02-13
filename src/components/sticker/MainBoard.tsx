@@ -4,7 +4,7 @@ import {useRef, useState} from "react";
 import StickerContextMenu from "./StickerContextMenu.tsx";
 
 const MainBoard = () => {
-    const {handleSlotClick, activeBoard} = usePraiseSticker();
+    const {handleSlotClick, activeBoard, deleteStickers} = usePraiseSticker();
 
     const [selectedSlots, setSelectedSlots] = useState<number[]>([]); //선택된 슬롯 ID
     const [dragStart, setDragStart] = useState<{x:number, y:number} | null>(null);
@@ -130,7 +130,7 @@ const MainBoard = () => {
                     y={contextMenu.y}
                     selectedCount={selectedSlots.length}
                     onClose={() => setContextMenu(null)}
-                    onDelete={() => null}
+                    onDelete={() => deleteStickers(selectedSlots)}
                     onChangeImage={() => null}
                 />
             )}
