@@ -1,5 +1,3 @@
-import type {ApiResponse} from "../types/api.ts";
-import {client} from "./client.ts";
 import type {MenuItem} from "../types/menu.ts";
 
 
@@ -41,6 +39,7 @@ export const fetchMenuItems = async ():Promise<MenuItem[]> => {
             subMenu:[
                 {id:31, title: '투두 리스트', link:'/todo', contentName:'todoKeyword'},
                 {id:32, title: '칭찬 스티커', link:'/praise_sticker', contentName:'praiseSticker'},
+                {id:33, title: '거래내역 업로드', link:'/account-book/upload', contentName:'accountBookUpload'},
             ]
         }
     ]
